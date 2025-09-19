@@ -88,15 +88,19 @@ const ProjectChat = ({ projectId }) => {
                 <Bot className="w-5 h-5 text-white" />
               )}
             </div>
-            <div className={`max-w-[80%] p-4 rounded-2xl ${
+            {/* --- THIS IS THE FIX --- */}
+            {/* The parent div handles all the styling with Tailwind classes. */}
+            {/* The ReactMarkdown component itself has NO className prop. */}
+            <div className={`prose prose-sm max-w-none p-4 rounded-2xl ${
               msg.role === 'user'
                 ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
                 : 'bg-white border border-gray-200 text-gray-900'
             }`}>
-              <ReactMarkdown className="prose prose-sm max-w-none">
+              <ReactMarkdown>
                 {msg.content}
               </ReactMarkdown>
             </div>
+            {/* -------------------------- */}
           </div>
         ))}
 
