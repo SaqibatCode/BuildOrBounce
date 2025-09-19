@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: sans-serif; margin: 0; padding: 0; width: 3.5in; height: 2in; background-color: {{backgroundColor}}; color: {{textColor}}; display: flex; align-items: center; justify-content: center; }
+        .card { text-align: center; }
+        .logo { width: 60px; height: 60px; margin: 0 auto 0.2in auto; }
+        .name { font-size: 16pt; font-weight: 600; margin: 0; letter-spacing: 1px; }
+        .title { font-size: 9pt; margin: 0.05in 0 0.2in 0; color: {{secondaryColor}}; }
+        .contact { font-size: 8pt; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="logo">{{logoSvg}}</div>
+        <div class="name">{{userName}}</div>
+        <div class="title">Founder</div>
+        <div class="contact">{{domainName}} &nbsp;|&nbsp; {{userEmail}}</div>
+    </div>
+</body>
+</html>
