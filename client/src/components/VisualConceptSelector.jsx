@@ -1,5 +1,5 @@
 import React from 'react';
-import { Palette, Sparkles, Loader2, Eye } from 'lucide-react';
+import { Palette, Loader2, Eye } from 'lucide-react';
 
 const VisualConceptSelector = ({ concepts, onSelect, isLoading }) => {
   return (
@@ -22,26 +22,22 @@ const VisualConceptSelector = ({ concepts, onSelect, isLoading }) => {
             onClick={() => !isLoading && onSelect(index)}
             title={`Select Concept #${index + 1}`}
           >
-            {/* Image */}
             <img 
               src={`data:image/png;base64,${base64Image}`} 
               alt={`Visual Concept ${index + 1}`}
               className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-300"
             />
             
-            {/* Hover Overlay */}
             <div className="absolute inset-0 bg-gradient-to-br from-pink-600/20 to-purple-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl flex items-center justify-center">
               <div className="bg-white/90 backdrop-blur-sm rounded-full p-4 transform scale-75 group-hover:scale-100 transition-transform duration-300">
                 <Eye className="w-8 h-8 text-pink-600" />
               </div>
             </div>
 
-            {/* Selection Number */}
             <div className="absolute top-4 right-4 w-8 h-8 bg-gradient-to-r from-pink-600 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg">
               {index + 1}
             </div>
 
-            {/* Concept Label */}
             <div className="absolute bottom-4 left-4 right-4">
               <div className="bg-white/90 backdrop-blur-sm rounded-xl p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <p className="text-sm font-semibold text-gray-900">Concept {index + 1}</p>

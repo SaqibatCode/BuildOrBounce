@@ -18,7 +18,7 @@ const BrandKitSchema = new mongoose.Schema({
     heading: String, // e.g., "Poppins"
     body: String,    // e.g., "Lato"
   },
-  logoSvg: {
+  logoUrl: {
     type: String, // Will store the raw SVG code
     required: true,
   },

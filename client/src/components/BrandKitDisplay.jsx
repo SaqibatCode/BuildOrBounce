@@ -1,5 +1,5 @@
 import React from 'react';
-import { Palette, Download, ExternalLink } from 'lucide-react';
+import { Palette, Download } from 'lucide-react';
 
 const ColorSwatch = ({ color, name }) => (
   <div className="text-center group">
@@ -15,7 +15,8 @@ const ColorSwatch = ({ color, name }) => (
 const BrandKitDisplay = ({ brandKit }) => {
   if (!brandKit) return null;
 
-  const { palette, fonts, logoSvg } = brandKit;
+  // --- CHANGE #1: Destructure 'logoUrl' instead of 'logoSvg' ---
+  const { palette, fonts, logoUrl } = brandKit;
   const fontLink = `https://fonts.googleapis.com/css2?family=${fonts.heading.replace(' ', '+')}:wght@700&family=${fonts.body.replace(' ', '+')}:wght@400&display=swap`;
   const fullBusinessCardUrl = `${import.meta.env.VITE_API_BASE_URL}${brandKit.businessCardUrl}`;
 
@@ -37,15 +38,16 @@ const BrandKitDisplay = ({ brandKit }) => {
       <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl p-8 mb-8 text-center">
         <h3 className="text-xl font-bold text-gray-900 mb-6">Logo</h3>
         <div className="bg-white rounded-2xl p-8 shadow-lg inline-block">
-          <div
-            className="w-32 h-32 mx-auto flex items-center justify-center"
-            style={{ color: palette.primary }}
-            dangerouslySetInnerHTML={{ __html: logoSvg }}
+          {/* --- CHANGE #2: Replace the div with an <img> tag to display the logo --- */}
+          <img
+            src={logoUrl}
+            alt="Brand Logo"
+            className="w-32 h-32 mx-auto object-contain"
           />
         </div>
       </div>
 
-      {/* Colors Section */}
+      {/* Colors Section (No changes needed) */}
       <div className="mb-8">
         <h3 className="text-xl font-bold text-gray-900 mb-6 text-center">Color Palette</h3>
         <div className="flex justify-center space-x-8 flex-wrap gap-4">
@@ -57,17 +59,14 @@ const BrandKitDisplay = ({ brandKit }) => {
         </div>
       </div>
 
-      {/* Fonts Section */}
+      {/* Fonts Section (No changes needed) */}
       <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl p-8 mb-8">
         <h3 className="text-xl font-bold text-gray-900 mb-6 text-center">Typography</h3>
         <div className="text-center">
           <div className="mb-6">
             <h4 
               className="text-4xl font-bold mb-2"
-              style={{ 
-                fontFamily: `'${fonts.heading}', sans-serif`, 
-                color: palette.primary 
-              }}
+              style={{ fontFamily: `'${fonts.heading}', sans-serif`, color: palette.primary }}
             >
               {fonts.heading}
             </h4>
@@ -76,20 +75,16 @@ const BrandKitDisplay = ({ brandKit }) => {
           <div>
             <p 
               className="text-lg leading-relaxed"
-              style={{ 
-                fontFamily: `'${fonts.body}', sans-serif`, 
-                color: palette.neutral_dark 
-              }}
+              style={{ fontFamily: `'${fonts.body}', sans-serif`, color: palette.neutral_dark }}
             >
-              {fonts.body} - Perfect for body text and paragraphs. 
-              Highly readable and beautifully complements your heading font.
+              {fonts.body} - Perfect for body text and paragraphs. Highly readable and beautifully complements your heading font.
             </p>
             <p className="text-gray-600 mt-2">Body Font</p>
           </div>
         </div>
       </div>
 
-      {/* Download Section */}
+      {/* Download Section (No changes needed) */}
       {brandKit.businessCardUrl && (
         <div className="text-center">
           <a 

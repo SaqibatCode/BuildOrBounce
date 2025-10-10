@@ -14,8 +14,9 @@ import { getSmartDomainSuggestions } from '../services/domainService.js';
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 // =================================================================
-// AUTHENTICATED USER ACTIONS
+// UNCHANGED FUNCTIONS
 // =================================================================
 
 export const getProjectsForUser = async (req, res) => {
@@ -57,12 +58,7 @@ export const overrideVerdict = async (req, res) => {
   }
 };
 
-// =================================================================
-// PROJECT WORKFLOW CONTROLLERS
-// =================================================================
-
 export const createProject = async (req, res) => {
-  // ... (This function remains unchanged)
   const { title, pitch, problem, target_user, channels, monetization } = req.body;
   if (!title || !pitch) return res.status(400).json({ message: 'Title and Pitch are required.' });
   try {
@@ -75,7 +71,6 @@ export const createProject = async (req, res) => {
 };
 
 export const validateProject = async (req, res) => {
-  // ... (This function remains unchanged)
   try {
     const project = await Project.findById(req.params.id);
     if (!project) return res.status(404).json({ message: 'Project not found.' });
@@ -93,7 +88,6 @@ export const validateProject = async (req, res) => {
 };
 
 export const saveCrossQA = async (req, res) => {
-  // ... (This function remains unchanged)
   const { question, answer } = req.body;
   const { id: projectId } = req.params;
   if (!question || !answer) return res.status(400).json({ message: 'Question and answer are required.' });
@@ -116,10 +110,7 @@ export const getDomainSuggestions = async (req, res) => {
     if (!project) {
       return res.status(404).json({ message: 'Project not found.' });
     }
-
-    // Ensure the correct function is called and the user ID is passed
     const availableDomains = await getSmartDomainSuggestions(project, req.user.id);
-
     res.status(200).json(availableDomains);
   } catch (error) {
     console.error('Error in getDomainSuggestions controller:', error);
@@ -128,7 +119,6 @@ export const getDomainSuggestions = async (req, res) => {
 };
 
 export const selectDomain = async (req, res) => {
-  // ... (This function remains unchanged)
   const { domainName } = req.body;
   const { id: projectId } = req.params;
   try {
@@ -146,7 +136,7 @@ export const selectDomain = async (req, res) => {
 };
 
 /**
- * @description NEW: Controller for STEP 1 of Brand Identity: Fetch SVG logo options from Gemini.
+ * @description Controller for STEP 1 of Brand Identity: Fetch image logo options.
  */
 export const getLogoOptions = async (req, res) => {
   try {
@@ -159,21 +149,35 @@ export const getLogoOptions = async (req, res) => {
   }
 };
 
+// =================================================================
+// UPDATED FUNCTIONS START HERE
+// =================================================================
+
 /**
- * @description REPLACED: Controller for STEP 2 & 3 of Brand Identity: Generate final kit from chosen SVG logo.
+ * @description Controller for STEP 2 & 3 of Brand Identity: Generate final kit from chosen logo URL.
  */
 export const generateBrandKit = async (req, res) => {
-  const { chosenLogoSvg } = req.body;
-  if (!chosenLogoSvg) return res.status(400).json({ message: 'A chosen SVG logo must be provided.' });
+  // --- FIX #1: Expect 'chosenLogoUrl' from the frontend ---
+  const { chosenLogoUrl } = req.body;
+  if (!chosenLogoUrl) {
+    return res.status(400).json({ message: 'A chosen logo URL must be provided.' });
+  }
+
   try {
     const project = await Project.findById(req.params.id);
     if (!project) return res.status(404).json({ message: 'Project not found.' });
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: 'User not found.' });
 
-    const brandData = await generateComplementaryBrandData(chosenLogoSvg);
-    brandData.logoSvg = chosenLogoSvg; // Add the chosen logo to the data object
+    // --- FIX #2: Pass the URL to the service ---
+    const complementaryData = await generateComplementaryBrandData(chosenLogoUrl);
 
+    // Create a final, clean object to pass to other services and to save
+    const brandData = {
+      ...complementaryData, // This has palette and fonts
+      logoUrl: chosenLogoUrl
+    };
+    
     const businessCardPdf = await generateBusinessCardPdf(brandData, user, project);
 
     const projectDir = path.join(__dirname, '..', 'public', 'uploads', project._id.toString());
@@ -183,11 +187,12 @@ export const generateBrandKit = async (req, res) => {
     fs.writeFileSync(path.join(projectDir, cardFileName), businessCardPdf);
     const businessCardUrl = `/uploads/${project._id}/${cardFileName}`;
 
+    // --- FIX #3: Save `logoUrl` to the database, NOT `logoSvg` ---
     const newBrandKit = await BrandKit.create({
       project_id: project._id,
       palette: brandData.palette,
       fonts: brandData.fonts,
-      logoSvg: brandData.logoSvg,
+      logoUrl: brandData.logoUrl, // This assumes your BrandKit model is updated
       businessCardUrl: businessCardUrl,
     });
 
@@ -202,9 +207,7 @@ export const generateBrandKit = async (req, res) => {
 };
 
 export const generateWebsite = async (req, res) => {
-  // ... (This function remains unchanged)
   try {
-    console.log(req.user.id)
     const project = await Project.findById(req.params.id)
       .populate('brand_kit_id')
       .populate('cross_qa_ids');
@@ -212,14 +215,18 @@ export const generateWebsite = async (req, res) => {
     if (!project.brand_kit_id) return res.status(400).json({ message: 'Brand kit must be generated first.' });
 
     const htmlContent = await generateWebsiteHtml(project, project.brand_kit_id, project.cross_qa_ids, req.user.id);
+    
+    // --- FIX #4: `saveFilesLocally` no longer handles logos, just HTML ---
     const filesToSave = {
       htmlContent,
-      logoSvg: project.brand_kit_id.logoSvg,
     };
-    const { logoUrl, zipUrl } = await saveFilesLocally(project._id, filesToSave);
+    const { zipUrl } = await saveFilesLocally(project._id, filesToSave);
 
+    // --- FIX #5: Save the correct logo URL from the BrandKit to the Website document ---
     const newWebsite = await Website.create({
-      project_id: project._id, zipUrl, logoUrl,
+      project_id: project._id,
+      zipUrl,
+      logoUrl: project.brand_kit_id.logoUrl,
     });
 
     project.website_id = newWebsite._id;

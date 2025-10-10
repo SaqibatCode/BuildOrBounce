@@ -19,7 +19,7 @@ export async function generateWebsiteHtml(project, brandKit, crossQA, userId) { 
   // We must PASS the userId along to the next service.
   const imageUrls = await getImagesForProject(project, userId);
   // ----------------------
-  
+
   const heroImage = imageUrls[0];
   const featureImages = imageUrls.slice(1, 4);
 
@@ -51,11 +51,22 @@ export async function generateWebsiteHtml(project, brandKit, crossQA, userId) { 
   `;
 
   const userPrompt = `
-    **Project Details:**
+   **Project Details:**
     Name: ${project.title}
-    // ... (rest of the long prompt is unchanged)
+
+    **Full Brand Kit:**
+    ${JSON.stringify(brandKit, null, 2)}
+
+    **Full Mission & Vision Q&A (Use for all copywriting):**
+    ${qaSummary}
+
+    **Image Assets (Use these exactly as specified):**
+    - Hero Image URL: ${heroImage}
+    - Feature Image URLs: [${featureImages.join(', ')}]
+
+    Generate the complete, award-winning 'index.html' file now.
   `;
-  
+
   try {
     const completion = await openai.chat.completions.create({
       model: 'gpt-5',
@@ -68,7 +79,7 @@ export async function generateWebsiteHtml(project, brandKit, crossQA, userId) { 
 
     // STEP 3: The Bug Fix (This part is unchanged)
     htmlContent = htmlContent.replace(/^```html\s*/, '').replace(/\s*```$/, '');
-    
+
     return htmlContent;
 
   } catch (error) {

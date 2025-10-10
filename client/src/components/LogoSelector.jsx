@@ -10,22 +10,25 @@ const LogoSelector = ({ logoOptions, onSelect, isLoading }) => {
         </div>
         <h2 className="text-3xl font-bold text-gray-900 mb-4">Select Your Official Logo</h2>
         <p className="text-gray-600 text-lg">
-          Our AI has generated these vector logo options. Your choice will define the rest of your brand identity.
+          Our AI has generated these logo options. Your choice will define the rest of your brand identity.
         </p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {logoOptions.map((svgString, index) => (
+        {/* --- CHANGE #1: Renamed 'svgString' to 'imageUrl' for clarity --- */}
+        {logoOptions.map((imageUrl, index) => (
           <div
             key={index}
-            className="group relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border-2 border-gray-200 hover:border-purple-500 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-xl flex items-center justify-center overflow-hidden"
-            onClick={() => !isLoading && onSelect(svgString)}
+            className="group relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border-2 border-gray-200 hover:border-purple-500 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-xl flex items-center justify-center overflow-hidden p-4"
+            // --- CHANGE #2: Pass the 'imageUrl' to the onSelect function when clicked ---
+            onClick={() => !isLoading && onSelect(imageUrl)}
             title={`Select Logo #${index + 1}`}
           >
-            {/* Logo Content */}
-            <div 
-              className="w-16 h-16 text-gray-700 group-hover:scale-110 transition-transform duration-300"
-              dangerouslySetInnerHTML={{ __html: svgString }}
+            {/* --- CHANGE #3: Replaced the div with a proper <img> tag --- */}
+            <img 
+              src={imageUrl}
+              alt={`Logo Option ${index + 1}`}
+              className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
             />
             
             {/* Hover Overlay */}
