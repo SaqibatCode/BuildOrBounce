@@ -185,7 +185,7 @@ const Navbar = () => {
       {/* Click outside to close dropdown */}
       {showDropdown && (
         <div 
-          className="fixed inset-0 z-40" 
+          className="fixed inset-0 hidden" 
           onClick={() => setShowDropdown(false)}
         />
       )}
